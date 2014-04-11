@@ -19,7 +19,7 @@ class Injector {
 
   Injector _root;
 
-  Map<Key, _Provider> _providers = <Key, _Provider>{};
+  Map<int, _Provider> _providers = <int, _Provider>{};
 
   final Map<Key, Object> instances = <Key, Object>{};
 
@@ -34,7 +34,7 @@ class Injector {
    */
   Iterable<Type> get _types {
     if (_typesCache == null) {
-      _typesCache = _providers.keys.map((k) => k.type);
+      _typesCache = _providers.values.map((_Provider v) => v.type);
     }
     return _typesCache;
   }
@@ -52,7 +52,7 @@ class Injector {
         _providers.addAll(module._bindings);
       });
     }
-    _providers[new Key(Injector)] = new _ValueProvider(this);
+    _providers[new Key(Injector).hashCode] = new _ValueProvider(Injector, this);
   }
 
   Injector get root => _root;
@@ -125,8 +125,9 @@ class Injector {
 
   /// Returns a pair for provider and the injector where it's defined.
   _ProviderWithDefiningInjector _getProviderWithInjectorForKey(Key key) {
-    if (_providers.containsKey(key)) {
-      return new _ProviderWithDefiningInjector(_providers[key], this);
+    var keyHash = key.hashCode;
+    if (_providers.containsKey(keyHash)) {
+      return new _ProviderWithDefiningInjector(_providers[keyHash], this);
     }
 
     if (parent != null) {
