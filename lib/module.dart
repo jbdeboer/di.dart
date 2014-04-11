@@ -18,7 +18,7 @@ typedef Object TypeFactory(factory(Type type, Type annotation));
  * module have no effect.
  */
 class Module {
-  final _providers = <int /* Key.hashCode */, _Provider>{};
+  final _providers = new HashMap<String /* Key.hashCode */, _Provider>();
   final _childModules = <Module>[];
   Map<Type, TypeFactory> _typeFactories = {};
 
@@ -38,15 +38,15 @@ class Module {
     _typeFactories = factories;
   }
 
-  Map<int /* Key.hashCode */, _Provider> _providersCache;
+  Map<String /* Key.hashCode */, _Provider> _providersCache;
 
   /**
    * Compiles and returs bindings map by performing depth-first traversal of the
    * child (installed) modules.
    */
-  Map<int /* Key.hashCode */, _Provider> get _bindings {
+  Map<String /* Key.hashCode */, _Provider> get _bindings {
     if (_isDirty) {
-      _providersCache = <int, _Provider>{};
+      _providersCache = <String, _Provider>{};
       _childModules.forEach((child) => _providersCache.addAll(child._bindings));
       _providersCache.addAll(_providers);
     }
@@ -61,7 +61,7 @@ class Module {
   void value(Type id, value, {Type withAnnotation, Visibility visibility}) {
     _dirty();
     Key key = new Key(id, withAnnotation);
-    _providers[key.hashCode] = new _ValueProvider(id, value, visibility);
+    _providers[key.hashCodeStr] = new _ValueProvider(id, value, visibility);
   }
 
   /**
@@ -75,7 +75,7 @@ class Module {
       Visibility visibility}) {
     _dirty();
     Key key = new Key(id, withAnnotation);
-    _providers[key.hashCode] = new _TypeProvider(
+    _providers[key.hashCodeStr] = new _TypeProvider(
         implementedBy == null ? id : implementedBy, visibility);
   }
 
@@ -93,7 +93,7 @@ class Module {
 
   void _keyedFactory(Key key, FactoryFn factoryFn, {Visibility visibility}) {
     _dirty();
-    _providers[key.hashCode] = new _FactoryProvider(key.type, factoryFn, visibility);
+    _providers[key.hashCodeStr] = new _FactoryProvider(key.type, factoryFn, visibility);
   }
 
   /**

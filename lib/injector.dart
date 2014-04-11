@@ -19,7 +19,7 @@ class Injector {
 
   Injector _root;
 
-  Map<int, _Provider> _providers = <int, _Provider>{};
+  Map<String, _Provider> _providers = new HashMap<String /* Key.hashCode */, _Provider>();
 
   final Map<Key, Object> instances = <Key, Object>{};
 
@@ -52,7 +52,7 @@ class Injector {
         _providers.addAll(module._bindings);
       });
     }
-    _providers[new Key(Injector).hashCode] = new _ValueProvider(Injector, this);
+    _providers[new Key(Injector).hashCodeStr] = new _ValueProvider(Injector, this);
   }
 
   Injector get root => _root;
@@ -125,7 +125,7 @@ class Injector {
 
   /// Returns a pair for provider and the injector where it's defined.
   _ProviderWithDefiningInjector _getProviderWithInjectorForKey(Key key) {
-    var keyHash = key.hashCode;
+    var keyHash = key.hashCodeStr;
     if (_providers.containsKey(keyHash)) {
       return new _ProviderWithDefiningInjector(_providers[keyHash], this);
     }
