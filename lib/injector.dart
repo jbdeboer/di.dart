@@ -49,7 +49,8 @@ class Injector {
     _root = parent == null ? this : parent._root;
     if (modules != null) {
       modules.forEach((module) {
-        _providers.addAll(module._bindings);
+        module.emitBindings(_providers);
+        //_providers.addAll(module._bindings);
       });
     }
     _providers[new Key(Injector)] = new _ValueProvider(this);
@@ -80,7 +81,7 @@ class Injector {
   }
 
   dynamic _getInstanceByKey(Key key, Injector requester) {
-    _checkKeyConditions(key);
+    assert(_checkKeyConditions(key));
 
     if (resolving.contains(key)) {
       throw new CircularDependencyError(

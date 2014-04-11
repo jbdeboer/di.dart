@@ -44,13 +44,10 @@ class Module {
    * Compiles and returs bindings map by performing depth-first traversal of the
    * child (installed) modules.
    */
-  Map<Key, _Provider> get _bindings {
-    if (_isDirty) {
-      _providersCache = <Key, _Provider>{};
-      _childModules.forEach((child) => _providersCache.addAll(child._bindings));
-      _providersCache.addAll(_providers);
-    }
-    return _providersCache;
+  void emitBindings(Map out) {
+
+      _childModules.forEach((child) => child.emitBindings(out));
+      out.addAll(_providers);
   }
 
   /**
