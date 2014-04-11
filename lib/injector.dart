@@ -19,22 +19,26 @@ class Injector {
 
   Injector _root;
 
-  Map<Key, _Provider> _providers = <Key, _Provider>{};
+  final List<Map> _moduleProviders = [];
 
-  final Map<Key, Object> instances = <Key, Object>{};
+  final Map<Key, _Provider> _providers = new HashMap<Key, _Provider>();
+
+  final Map<Key, Object> instances = new HashMap<Key, Object>();
 
   final List<Key> resolving = <Key>[];
 
   final bool allowImplicitInjection;
 
-  Iterable<Type> _typesCache;
+  Set<Type> _typesCache;
 
   /**
    * List of all types which the injector can return
    */
   Iterable<Type> get _types {
     if (_typesCache == null) {
-      _typesCache = _providers.keys.map((k) => k.type);
+      _typesCache = new HashSet();
+      _providers.keys.forEach((k) => _typesCache.add(k.type));
+      _moduleProviders.forEach((p) => p.keys.forEach((k) => _typesCache.add(k.type)));
     }
     return _typesCache;
   }
@@ -49,7 +53,10 @@ class Injector {
     _root = parent == null ? this : parent._root;
     if (modules != null) {
       modules.forEach((module) {
-        _providers.addAll(module._bindings);
+        module.bindingList(_moduleProviders);
+        //_moduleProviders.addAll(module._bindingList);
+        //print("adding ${module._bindingList}");
+        //_providers.addAll(module._bindings);
       });
     }
     _providers[new Key(Injector)] = new _ValueProvider(this);
@@ -128,6 +135,15 @@ class Injector {
     if (_providers.containsKey(key)) {
       return new _ProviderWithDefiningInjector(_providers[key], this);
     }
+
+    // Search the modules
+    //print("searching ${_moduleProviders.length} modules");
+    for (var i = 0, ii = _moduleProviders.length; i < ii; i++) {
+      var p = _moduleProviders[i];
+      if (p.containsKey(key)) {
+        return new _ProviderWithDefiningInjector(_providers[key] = p[key], this);
+      }
+    };
 
     if (parent != null) {
       return parent._getProviderWithInjectorForKey(key);

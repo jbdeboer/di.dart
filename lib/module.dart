@@ -18,9 +18,10 @@ typedef Object TypeFactory(factory(Type type, Type annotation));
  * module have no effect.
  */
 class Module {
-  final _providers = <Key, _Provider>{};
+  final _providers = new HashMap<Key, _Provider>();
   final _childModules = <Module>[];
-  Map<Type, TypeFactory> _typeFactories = {};
+  final _bindingList = <Map>[];
+  Map<Type, TypeFactory> _typeFactories = new HashMap<Type, TypeFactory>();
 
   Map<Type, TypeFactory> get typeFactories {
     if (_childModules.isEmpty) return _typeFactories;
@@ -46,11 +47,16 @@ class Module {
    */
   Map<Key, _Provider> get _bindings {
     if (_isDirty) {
-      _providersCache = <Key, _Provider>{};
+      _providersCache = new HashMap<Key, _Provider>();
       _childModules.forEach((child) => _providersCache.addAll(child._bindings));
       _providersCache.addAll(_providers);
     }
     return _providersCache;
+  }
+
+  void bindingList(List out) {
+    out.add(_providers);
+    _childModules.forEach((child) => child.bindingList(out));
   }
 
   /**
@@ -101,12 +107,15 @@ class Module {
    * take precidence over the installed module.
    */
   void install(Module module) {
+    //_bindingList.add(module._providers);
     _childModules.add(module);
     _dirty();
   }
 
   _dirty() {
     _providersCache = null;
+    // Also, the providers will have something interesting.
+    _bindingList.add(_providers);
   }
 
   bool get _isDirty =>
