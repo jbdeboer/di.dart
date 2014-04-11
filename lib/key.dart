@@ -3,13 +3,15 @@ part of di;
 class Key {
   final Type type;
   final Type annotation;
+  int hashCode;
 
-  const Key(this.type, [this.annotation]);
+  Key(this.type, [this.annotation]) {
+    hashCode = type.hashCode + annotation.hashCode;
+  }
 
   bool operator ==(other) =>
       other is Key && other.type == type && other.annotation == annotation;
 
-  int get hashCode => type.hashCode + annotation.hashCode;
 
   String toString() {
     String asString = type.toString();

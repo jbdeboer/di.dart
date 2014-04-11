@@ -7,9 +7,9 @@ class Injector {
    */
   final String name;
 
-  static const List<Key> _PRIMITIVE_TYPES = const <Key>[
-    const Key(num), const Key(int), const Key(double), const Key(String),
-    const Key(bool)
+  static  List<Key> _PRIMITIVE_TYPES = <Key>[
+    new Key(num), new Key(int), new Key(double), new Key(String),
+    new Key(bool)
   ];
 
   /**
