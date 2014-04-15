@@ -129,7 +129,7 @@ abstract class _Provider {
   _Provider(this.type, this.visibility);
 
   dynamic get(Injector injector, Injector requestor,
-      ObjectFactory getInstanceByKey, error,
+      ObjectFactory getInstanceByKey,
       List<Key> resolving);
 }
 
@@ -140,16 +140,16 @@ class _ValueProvider extends _Provider {
       : super(type, visibility);
 
   dynamic get(Injector injector, Injector requestor,
-      ObjectFactory getInstanceByKey, error, resolving) => value;
+      ObjectFactory getInstanceByKey, resolving) => value;
 }
 
 class _TypeProvider extends _Provider {
   _TypeProvider(type, [Visibility visibility]) : super(type, visibility);
 
   dynamic get(Injector injector, Injector requestor,
-      ObjectFactory getInstanceByKey, error, resolving) {
+      ObjectFactory getInstanceByKey, resolving) {
     return injector.newInstanceOf(
-        type, getInstanceByKey, requestor, error, resolving);
+        type, getInstanceByKey, requestor, resolving);
   }
 }
 
@@ -160,6 +160,6 @@ class _FactoryProvider extends _Provider {
       : super(type, visibility);
 
   dynamic get(Injector injector, Injector requestor,
-       ObjectFactory getInstanceByKey, error, resolving) =>
+       ObjectFactory getInstanceByKey, resolving) =>
      factoryFn(new InjectorDelagate(injector, resolving));
 }

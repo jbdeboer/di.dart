@@ -20,11 +20,10 @@ class DynamicInjector extends Injector {
       new DynamicInjector._fromParent(modules, this, name: name);
 
   Object newInstanceOf(Type type, ObjectFactory getInstanceByKey, Injector requestor,
-                        error(resolving, message, [appendDependency]),
                         List<Key> resolving) {
     var classMirror = reflectType(type);
     if (classMirror is TypedefMirror) {
-      throw new NoProviderError(error(resolving, 'No implementation provided '
+      throw new NoProviderError(Injector.error(resolving, 'No implementation provided '
           'for ${getSymbolName(classMirror.qualifiedName)} typedef!'));
     }
 
@@ -40,11 +39,11 @@ class DynamicInjector extends Injector {
       ParameterMirror p = ctor.parameters[pos];
       if (p.type.qualifiedName == #dynamic) {
         var name = MirrorSystem.getName(p.simpleName);
-        throw new NoProviderError(error(resolving, "The '$name' parameter must be typed"));
+        throw new NoProviderError(Injector.error(resolving, "The '$name' parameter must be typed"));
       }
       if (p.type is TypedefMirror) {
         throw new NoProviderError(
-            error(resolving, 'Cannot create new instance of a typedef ${p.type}'));
+            Injector.error(resolving, 'Cannot create new instance of a typedef ${p.type}'));
       }
       if (p.metadata.isNotEmpty) {
         assert(p.metadata.length == 1);

@@ -75,7 +75,7 @@ abstract class Injector {
     return types;
   }
 
-  String _error(resolving, message, [appendDependency]) {
+  static String error(resolving, message, [appendDependency]) {
     if (appendDependency != null) {
       resolving.add(appendDependency);
     }
@@ -91,7 +91,7 @@ abstract class Injector {
     // Do not bother checking the array until we are fairly deep.
     if (resolving.length > 30 && resolving.contains(key)) {
       throw new CircularDependencyError(
-          _error(resolving, 'Cannot resolve a circular dependency!', key));
+          Injector.error(resolving, 'Cannot resolve a circular dependency!', key));
     }
 
     var providerWithInjector = _getProviderWithInjectorForKey(key, resolving);
@@ -107,7 +107,7 @@ abstract class Injector {
       if (!visible) {
         if (injector.parent == null) {
           throw new NoProviderError(
-              _error(resolving, 'No provider found for ${key}!', key));
+              Injector.error(resolving, 'No provider found for ${key}!', key));
         }
         injector =
             injector.parent._getProviderWithInjectorForKey(key, resolving).injector;
@@ -116,7 +116,7 @@ abstract class Injector {
     }
 
     resolving.add(key);
-    var value = provider.get(this, requester, _getInstanceByKey, _error, resolving);
+    var value = provider.get(this, requester, _getInstanceByKey, resolving);
     resolving.removeLast();
 
     // cache the value.
@@ -143,12 +143,12 @@ abstract class Injector {
           new _TypeProvider(key.type), this);
     }
 
-    throw new NoProviderError(_error(resolving, 'No provider found for ${key}!', key));
+    throw new NoProviderError(Injector.error(resolving, 'No provider found for ${key}!', key));
   }
 
   bool _checkKeyConditions(Key key, List resolving) {
     if (_PRIMITIVE_TYPES.contains(key)) {
-      throw new NoProviderError(_error(resolving, 'Cannot inject a primitive type '
+      throw new NoProviderError(Injector.error(resolving, 'Cannot inject a primitive type '
           'of ${key.type}!', key));
     }
     return true;
@@ -214,7 +214,7 @@ abstract class Injector {
         var providerWithInjector = _getProviderWithInjectorForKey(key, resolving);
         var provider = providerWithInjector.provider;
         forceNew._keyedFactory(key, (Injector inj) => provider.get(this,
-            inj, inj._getInstanceByKey, inj._error, resolving),
+            inj, inj._getInstanceByKey, resolving),
             visibility: provider.visibility);
       });
 
@@ -228,7 +228,6 @@ abstract class Injector {
   newFromParent(List<Module> modules, String name);
 
   Object newInstanceOf(Type type, ObjectFactory factory, Injector requestor,
-                       errorHandler(resolving, message, [appendDependency]),
                        List<Key> resolving);
 }
 

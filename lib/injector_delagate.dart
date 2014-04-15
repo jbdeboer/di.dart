@@ -17,9 +17,6 @@ class InjectorDelagate implements Injector {
   dynamic _getInstanceByKey(Key key, Injector requester, List<Key> resolving) =>
       _injector._getInstanceByKey(key, requester, resolving);
 
-  String _error(resolving, message, [appendDependency]) =>
-      _injector._error(resolving, message, appendDependency);
-
   Injector createChild(List<Module> modules,
                        {List forceNewInstances, String name}) =>
       _injector._createChildWithResolvingHistory(modules, _resolving,
